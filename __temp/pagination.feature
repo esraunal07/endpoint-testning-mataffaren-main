@@ -13,7 +13,7 @@ Feature: Testing pagination
     Then the status code of the response should be 200
     And the response time should be below 1000 milliseconds
     And there should be at least 1 product in the category
-    And the test should show that the "responsedata" is equal "currentPage"  
+    And the test should show that the "responsedata" is equal "currentPage"
 
     Examples:
        | categoryUrlParts |
