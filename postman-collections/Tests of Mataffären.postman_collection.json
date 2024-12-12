@@ -1,0 +1,970 @@
+{
+	"info": {
+		"_postman_id": "6ce5f8c3-5caf-409c-b567-9626c320f23a",
+		"name": "Tests of Mataffären",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26744065",
+		"_collection_link": "https://universal-resonance-666434.postman.co/workspace/Mat%C3%A4ffaren-~66128d35-440b-4aa4-a8a1-b213ce80b571/collection/26744065-6ce5f8c3-5caf-409c-b567-9626c320f23a?action=share&source=collection_link&creator=26744065"
+	},
+	"item": [
+		{
+			"name": "Get categories",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Get the data from the response unpacked from json",
+							"let responseData = pm.response.json();",
+							"",
+							"// Check that the status code is 200 (OK)",
+							"pm.test('The status code of the response should be 200', () => {",
+							"  pm.expect(pm.response).to.have.status(200);",
+							"});",
+							"",
+							"// Check that we have a response time of < 1 second",
+							"pm.test('The response time should be below 1 second', () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"})",
+							"",
+							"// Check that there are at least 10 main categories (children)",
+							"pm.test('There should be at least 10 main categories', () => {",
+							"  pm.expect(responseData.children.length).to.be.at.least(10);",
+							"});",
+							"",
+							"// Check that each main category has the properites title and url",
+							"pm.test('Each main category should have the properties title and url', () => {",
+							"    for(let category of responseData.children){",
+							"        // an empty string is falsy -> convert to false using !!",
+							"        // a string with content is truthy -> convert to true using !!",
+							"        pm.expect(!!category.title).to.be.true;",
+							"        pm.expect(!!category.url).to.be.true;",
+							"        // check that datatype is string for both title and url",
+							"        pm.expect(category.title).to.be.string;",
+							"        pm.expect(category.url).to.be.string;",
+							"    }",
+							"});",
+							"",
+							"// Save the responseData as a pm.variable",
+							"pm.variables.set('categoryData', responseData);",
+							"",
+							"// Set a counter for products within a main category to fecth as a pm.variable",
+							"pm.variables.set('categoryCounter', 0);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Set the domain",
+							"pm.environment.set('domain', 'http://localhost:4000')"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{domain}}/api/leftMenu/categorytree",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"leftMenu",
+						"categorytree"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get productlist within category",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Get the categories and the categoryCounter from pm.variables",
+							"let categories = pm.variables.get('categoryData');",
+							"let categoryCounter = pm.variables.get('categoryCounter');",
+							"",
+							"// Get the category part of the url and set it as an environment variable",
+							"let urlCategoryPart = categories.children[categoryCounter].url;",
+							"pm.environment.set('urlCategoryPart',urlCategoryPart);",
+							"",
+							"// Add 1 to the categoryCounter environment variable",
+							"pm.variables.set('categoryCounter', categoryCounter + 1);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Get the categories and the categoryCounter from pm.variables",
+							"let categories = pm.variables.get('categoryData');",
+							"let categoryCounter = pm.variables.get('categoryCounter');",
+							"",
+							"// Tests",
+							"",
+							"// Check that the status code is 200 (OK)",
+							"pm.test('The status code of the response should be 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Check that we have a response time of < 1 second",
+							"pm.test('The response time should be below 1 second', () => {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});",
+							"",
+							"// Check that we have at least one product in the this main category",
+							"let responseData = pm.response.json();",
+							"pm.test('There should be at least one product in a main category', () => {",
+							"    pm.expect(responseData.results.length).to.be.at.least(1);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{domain}}/api/c/{{urlCategoryPart}}?size=30&page=0&sort=topRated",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"c",
+						"{{urlCategoryPart}}"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "topRated"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByComparePrice-ASC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Yanıtın yapısını kontrol et\r",
+							"console.log(responseData);\r",
+							"\r",
+							"// 'results' veya benzeri bir alanın olup olmadığını kontrol edelim\r",
+							"let products = responseData.results || responseData.products || [];\r",
+							"\r",
+							"pm.test(\"At least one product is present\", function () {\r",
+							"    pm.expect(products).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Eğer 'products' dizisi varsa, sıralama testi yapalım\r",
+							"if (products.length > 0) {\r",
+							"    let productComparePrices = products.map(product => \r",
+							"        parseFloat(product.comparePrice.replace(\" kr\", \"\").replace(\",\", \".\"))\r",
+							"    );\r",
+							"\r",
+							"    let sortOrder = pm.request.url.query.find(q => q.key === \"sort\").value;\r",
+							"\r",
+							"    if (sortOrder === \"compareprice-asc\") {\r",
+							"        pm.test(\"Products are sorted by comparePrice in ascending order\", function () {\r",
+							"            for (let i = 0; i < productComparePrices.length - 1; i++) {\r",
+							"                pm.expect(productComparePrices[i]).to.be.at.most(productComparePrices[i + 1]);\r",
+							"            }\r",
+							"        });\r",
+							"    } else if (sortOrder === \"compareprice-desc\") {\r",
+							"        pm.test(\"Products are sorted by comparePrice in descending order\", function () {\r",
+							"            for (let i = 0; i < productComparePrices.length - 1; i++) {\r",
+							"                pm.expect(productComparePrices[i]).to.be.at.least(productComparePrices[i + 1]);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{domain}}/api/c/{{urlCategoryPart}}?size=30&page=0&sort=compareprice-asc",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"c",
+						"{{urlCategoryPart}}"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "compareprice-asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByComparePrice-DESC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"let responseData = pm.response.json();\r",
+							"let products = responseData.results || responseData.items || [];\r",
+							"\r",
+							"pm.test(\"At least one product is present\", function () {\r",
+							"    pm.expect(products).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Eğer ürünler varsa, sıralama testini yapalım\r",
+							"if (products.length > 0) {\r",
+							"    let productComparePrices = products.map(product => \r",
+							"        parseFloat(product.comparePrice.replace(\" kr\", \"\").replace(\",\", \".\"))\r",
+							"    );\r",
+							"\r",
+							"    // Sort products in descending order (just in case the API doesn't do it)\r",
+							"    let sortedComparePricesDesc = [...productComparePrices].sort((x, y) => y - x);\r",
+							"\r",
+							"    let sortOrder = pm.request.url.query.find(q => q.key === \"sort\").value;\r",
+							"\r",
+							"    if (sortOrder === \"compareprice-desc\") {\r",
+							"        pm.test(\"Products are sorted by comparePrice in descending order\", function () {\r",
+							"            for (let i = 0; i < productComparePrices.length; i++) {\r",
+							"                pm.expect(productComparePrices[i]).to.be.at.least(sortedComparePricesDesc[i]);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=compareprice-desc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "compareprice-desc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByPrice-ASC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"let responseData = pm.response.json();\r",
+							"let products = responseData.results || responseData.items || [];\r",
+							"\r",
+							"pm.test(\"At least one product is present\", function () {\r",
+							"    pm.expect(products).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Eğer ürünler varsa, sıralama testini yapalım\r",
+							"if (products.length > 0) {\r",
+							"    let productPrices = products.map(product => \r",
+							"        parseFloat(product.price.replace(\" kr\", \"\").replace(\",\", \".\"))\r",
+							"    );\r",
+							"\r",
+							"    // Sort products in ascending order (just in case the API doesn't do it)\r",
+							"    let sortedPricesAsc = [...productPrices].sort((x, y) => x - y);\r",
+							"\r",
+							"    let sortOrder = pm.request.url.query.find(q => q.key === \"sort\").value;\r",
+							"\r",
+							"    if (sortOrder === \"price-asc\") {\r",
+							"        pm.test(\"Products are sorted by price in ascending order\", function () {\r",
+							"            for (let i = 0; i < productPrices.length; i++) {\r",
+							"                pm.expect(productPrices[i]).to.be.at.most(sortedPricesAsc[i]);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=price-asc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "price-asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByPrice-DESC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"let responseData = pm.response.json();\r",
+							"let products = responseData.results || responseData.items || [];\r",
+							"\r",
+							"pm.test(\"At least one product is present\", function () {\r",
+							"    pm.expect(products).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Eğer ürünler varsa, sıralama testini yapalım\r",
+							"if (products.length > 0) {\r",
+							"    let productPrices = products.map(product => \r",
+							"        parseFloat(product.price.replace(\" kr\", \"\").replace(\",\", \".\"))\r",
+							"    );\r",
+							"\r",
+							"    // Sıralama (descending) kontrolü yapmak için\r",
+							"    let sortedPricesDesc = [...productPrices].sort((x, y) => y - x); // Azalan sıralama\r",
+							"\r",
+							"    let sortOrder = pm.request.url.query.find(q => q.key === \"sort\").value;\r",
+							"\r",
+							"    if (sortOrder === \"price-desc\") {\r",
+							"        pm.test(\"Products are sorted by price in descending order\", function () {\r",
+							"            for (let i = 0; i < productPrices.length - 1; i++) {\r",
+							"                // Fiyatları azalan sıraya göre karşılaştırıyoruz\r",
+							"                pm.expect(productPrices[i]).to.be.at.least(productPrices[i + 1]);\r",
+							"            }\r",
+							"        });\r",
+							"    }\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=price-desc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "price-desc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByRated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test: Yanıtın başarılı olup olmadığını kontrol et\r",
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test: Yanıt süresinin 1000ms altında olduğunu kontrol et\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"// Yanıt verilerini JSON formatında al\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Test: Kategoride en az bir ürün olup olmadığını kontrol et\r",
+							"pm.test(\"At least one product is present\", function () {\r",
+							"    pm.expect(responseData.results).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Test: \"topRated\" sıralama seçeneğinin \"selected\" özelliğini ve değerini kontrol et\r",
+							"pm.test('Test that \"topRated\" has property \"selected\" and is selected \"true\"', function () {\r",
+							"    let sortOption = responseData.sorts.find(sort => sort.code === \"topRated\");\r",
+							"    \r",
+							"    pm.expect(sortOption).to.have.property(\"selected\", true);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=topRated",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "topRated"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Page-Size",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test: Yanıtın başarılı olup olmadığını kontrol et\r",
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test: Yanıt süresinin 1000ms altında olduğunu kontrol et\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"// Yanıt verilerini JSON formatında al\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Test: Kategoride en az bir ürün olup olmadığını kontrol et\r",
+							"pm.test(\"At least one product is present\", function () {\r",
+							"    pm.expect(responseData.results).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Test: Sayfada dönen ürün sayısının belirtilen `size` parametresine uygun olup olmadığını kontrol et\r",
+							"pm.test(\"The number of products is at most the pageSize\", function () {\r",
+							"    let pageSize = 10;  // Beklenen ürün sayısı\r",
+							"    pm.expect(responseData.results.length).to.be.at.most(pageSize);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=10&page=0&sort=topRated",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "topRated"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pagination",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test: Yanıtın başarılı olup olmadığını kontrol et\r",
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test: Yanıt süresinin 1000ms altında olduğunu kontrol et\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"// Yanıt verilerini JSON formatında al\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Test: Kategoride en az bir ürün olup olmadığını kontrol et\r",
+							"pm.test(\"At least one product is present\", function () {\r",
+							"    pm.expect(responseData.results).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Sayfa numarasını belirleyin\r",
+							"let currentPage = 1;  // Bu değeri kullanıcının sağladığı sayfa numarasına göre ayarlayabilirsiniz\r",
+							"\r",
+							"pm.test(\"The responseData's currentPage matches the page number in the URL\", function () {\r",
+							"    // Yanıt verisini al\r",
+							"    let responseData = pm.response.json();\r",
+							"\r",
+							"    // URL'deki 'page' parametresini al\r",
+							"    let pageNumber = pm.request.url.query.find(q => q.key === \"page\").value;\r",
+							"\r",
+							"    // Yanıt verisindeki 'currentPage' değerini al (ya da 'page' kullan)\r",
+							"    let currentPage = responseData.currentPage; // Eğer 'page' varsa: responseData.page\r",
+							"\r",
+							"    // 'currentPage' veya 'page' ile URL'deki 'page' numarasını karşılaştır\r",
+							"    pm.expect(parseInt(pageNumber)).to.equal(currentPage); // currentPage'in pageNumber ile eşleşmesini bekliyoruz\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=1&sort=topRated",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "sort",
+							"value": "topRated"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByComparePrice-ASC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Artan Fiyat Sıralaması\r",
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.response.to.have.responseTime.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"At least 1 product is present\", function () {\r",
+							"    let responseData = pm.response.json();\r",
+							"    pm.expect(responseData.results).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Products are sorted by comparePrice in ascending order\", function () {\r",
+							"    let responseData = pm.response.json();\r",
+							"\r",
+							"    // Ürünlerin comparePrice değerlerini al\r",
+							"    let productComparePrices = responseData.results.map(product => \r",
+							"        parseFloat(product.comparePrice.replace(\" kr\", \"\").replace(\",\", \".\"))\r",
+							"    );\r",
+							"\r",
+							"    // comparePrice değerlerini sıralama\r",
+							"    let sortedComparePrices= [...productComparePrices].sort((x, y) => x - y);\r",
+							"\r",
+							"    // Sıralanmış ürün fiyatlarının orijinal sırayla uyumlu olduğunu kontrol et\r",
+							"    pm.expect(productComparePrices).to.deep.equal(sortedComparePrices);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=compareprice-asc\n",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "compareprice-asc\n"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByComparePrice-DESC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 2: Azalan Fiyat Sıralaması\r",
+							"pm.test(\"Response status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is below 1000 ms\", function () {\r",
+							"    pm.response.to.have.responseTime.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"At least 1 product is present\", function () {\r",
+							"    let responseData = pm.response.json();\r",
+							"    pm.expect(responseData.results).to.be.an(\"array\").that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Products are sorted by comparePrice in descending order\", function () {\r",
+							"    let responseData = pm.response.json();\r",
+							"\r",
+							"    // Ürünlerin comparePrice değerlerini al\r",
+							"    let productComparePrices = responseData.results.map(product => \r",
+							"        parseFloat(product.comparePrice.replace(\" kr\", \"\").replace(\",\", \".\"))\r",
+							"    );\r",
+							"\r",
+							"    // Konsola ürünlerin fiyatlarını yazdır (debugging için)\r",
+							"    console.log(\"Original comparePrices from response:\", productComparePrices);\r",
+							"\r",
+							"    // comparePrice değerlerini sıralama\r",
+							"    let sortedComparePrices = [...productComparePrices].sort((x, y) => y - x);\r",
+							"\r",
+							"    // Konsola sıralanmış fiyatları yazdır (debugging için)\r",
+							"    console.log(\"Expected sorted comparePrices (descending):\", sortedComparePrices);\r",
+							"\r",
+							"    // Sıralanmış ürün fiyatlarının orijinal sırayla uyumlu olduğunu kontrol et\r",
+							"    pm.expect(productComparePrices).to.deep.equal(sortedComparePrices);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=compareprice-desc\n",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "compareprice-desc\n"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SortByName",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Products are sorted by name\", function () {\r",
+							"    let response = pm.response.json();\r",
+							"    let products = response.results.map(p => p.name); // Ürün isimlerini al\r",
+							"    console.log(\"Products in response:\", products); // Debug için ürün isimlerini yazdır\r",
+							"    \r",
+							"    let sorted = [...products].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })); // Beklenen sıralama\r",
+							"    pm.expect(products).to.eql(sorted); // Sıralamanın doğru olduğunu kontrol et\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5175",
+					"path": [
+						"api",
+						"c",
+						"dryck"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "30"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "sort",
+							"value": "name"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "urlCategoryPart",
+			"value": "urlCategoryPart"
+		},
+		{
+			"key": "domain",
+			"value": "http://localhost:5175"
+		}
+	]
+}
