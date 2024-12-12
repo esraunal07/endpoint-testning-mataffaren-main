@@ -1029,3 +1029,5 @@ Feature: Sort products by Price
        |  |
        |  |
        |  |
+
+    

@@ -29,3 +29,5 @@ Feature: Sort products by Price
 
     Examples:
       | {dynamic: 'categoryUrlParts'} |
+
+    

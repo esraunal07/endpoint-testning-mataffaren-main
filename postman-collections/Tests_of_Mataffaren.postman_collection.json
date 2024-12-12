@@ -89,15 +89,15 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Get the categories and the categoryCounter from pm.variables",
-							"let categories = pm.variables.get('categoryData');",
-							"let categoryCounter = pm.variables.get('categoryCounter');",
-							"",
-							"// Get the category part of the url and set it as an environment variable",
-							"let urlCategoryPart = categories.children[categoryCounter].url;",
-							"pm.environment.set('urlCategoryPart',urlCategoryPart);",
-							"",
-							"// Add 1 to the categoryCounter environment variable",
+							"// Get the categories and the categoryCounter from pm.variables\r",
+							"let categories = pm.variables.get('categoryData');\r",
+							"let categoryCounter = pm.variables.get('categoryCounter');\r",
+							"\r",
+							"// Get the category part of the url and set it as an environment variable\r",
+							"let urlCategoryPart = categories.children[categoryCounter].url;\r",
+							"pm.environment.set('urlCategoryPart',urlCategoryPart);\r",
+							"\r",
+							"// Add 1 to the categoryCounter environment variable\r",
 							"pm.variables.set('categoryCounter', categoryCounter + 1);"
 						],
 						"type": "text/javascript",
@@ -128,10 +128,7 @@
 							"let responseData = pm.response.json();",
 							"pm.test('There should be at least one product in a main category', () => {",
 							"    pm.expect(responseData.results.length).to.be.at.least(1);",
-							"});",
-							"",
-							"",
-							""
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -154,14 +151,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{domain}}/api/c/{{urlCategoryPart}}?size=30&page=0&sort=topRated",
+					"raw": "{{domain}}/api/kott-chark-och-fagel/fagel?size=30&page=0&sort=topRated",
 					"host": [
 						"{{domain}}"
 					],
 					"path": [
 						"api",
-						"c",
-						"{{urlCategoryPart}}"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -320,16 +317,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=compareprice-desc",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=0&sort=compareprice-desc",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -401,16 +397,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=price-asc",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=0&sort=price-asc",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -483,16 +478,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=price-desc",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=0&sort=price-desc",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -554,16 +548,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=topRated",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=0&sort=topRated",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -624,16 +617,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=10&page=0&sort=topRated",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=10&page=0&sort=topRated",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -706,16 +698,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=1&sort=topRated",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=1&sort=topRated",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -781,16 +772,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=compareprice-asc\n",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=0&sort=compareprice-asc\n",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -863,16 +853,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=compareprice-desc\n",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=0&sort=compareprice-desc\n",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -927,16 +916,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:5175/api/c/dryck?size=30&page=0&sort=name",
-					"protocol": "http",
+					"raw": "{{domain}}/api/c/kott-chark-och-fagel/fagel?size=30&page=0&sort=name",
 					"host": [
-						"localhost"
+						"{{domain}}"
 					],
-					"port": "5175",
 					"path": [
 						"api",
 						"c",
-						"dryck"
+						"kott-chark-och-fagel",
+						"fagel"
 					],
 					"query": [
 						{
@@ -953,6 +941,14 @@
 						}
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
 			},
 			"response": []
 		}

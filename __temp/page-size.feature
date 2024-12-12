@@ -1,4 +1,4 @@
-  Feature: Testing pageSize
+ Feature: Testing pageSize
   As a REST api user
   I want to be able to test pageSize
   and have the information be correct in all categories.
@@ -19,7 +19,6 @@
     And the response time should be below 1000 milliseconds
     And there should be at least 1 product in the category
     And the test should show that the responseData is as most pageSize
-
 
     Examples:
        | categoryUrlParts |
@@ -1023,3 +1022,6 @@
        |  |
        |  |
        |  |
+
+
+    
