@@ -11,17 +11,14 @@ Replicate tests with Cucumber and fetch, integrating them into CI/CD.
 
 How to Run
 
-1- git clone <repository-url>
-cd <repository-name>
-
-2- Install dependencies:
+1- Install dependencies:
 npm install
 
-3- Start the app:
+2- Start the app:
 npm start
 
-4- Run Postman tests with Newman:
+3- Run Postman tests with Newman:
 npm test
 
-5- Run a specific Postman collection:
+4- Run a specific Postman collection:
 npx newman run postman-collections/NAME_of_COLLECTION.postman_collection.json
